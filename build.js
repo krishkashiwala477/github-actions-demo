@@ -1,4 +1,4 @@
-import fs from "fs-extra";
+const fs = require("fs-extra");
 
 // Clear the dist folder if it exists
 fs.emptyDirSync("dist");
