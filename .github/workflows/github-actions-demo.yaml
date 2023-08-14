@@ -33,5 +33,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Deploy to server
+        env:
+          GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=no"
         run: |
           ssh ubuntu@ec2-3-88-45-113.compute-1.amazonaws.com 'cd github-actions-demo && git pull && npm install && pm2 restart all'
