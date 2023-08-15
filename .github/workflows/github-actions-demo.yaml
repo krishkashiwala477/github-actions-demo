@@ -1,18 +1,42 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions ���
-on: [push]
+name: Node.js CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
-  Explore-GitHub-Actions:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo "��� The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "��� This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "��� The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - run: echo "��� The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "���️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14  # Use the desired Node.js version
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to server
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
         run: |
-          ls ${{ github.workspace }}
-      - run: echo "��� This job's status is ${{ job.status }}."
+          echo "$PRIVATE_KEY" > deploy_key
+          chmod 600 deploy_key
+          rsync -e "ssh -o StrictHostKeyChecking=no -i $(pwd)/deploy_key" -r --delete-after ./ ubuntu@ec2-54-163-35-94.compute-1.amazonaws.com:~/github-actions-demo
+          ssh -o StrictHostKeyChecking=no -i $(pwd)/deploy_key ubuntu@ec2-54-163-35-94.compute-1.amazonaws.com 'cd ~/github-actions-demo && git pull && npm install && pm2 restart all'
