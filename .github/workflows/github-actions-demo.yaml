@@ -34,6 +34,9 @@ jobs:
 
       - name: Deploy to server
         env:
-          GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=no"
+          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}  # Add your private key as a secret in your repository settings
         run: |
-          ssh ubuntu@ec2-3-88-45-113.compute-1.amazonaws.com 'cd github-actions-demo && git pull && npm install && pm2 restart all'
+          echo "$PRIVATE_KEY" > deploy_key
+          chmod 600 deploy_key
+          rsync -e "ssh -o StrictHostKeyChecking=no -i deploy_key" -r --delete-after ./ ubuntu@ec2-3-88-45-113.compute-1.amazonaws.com:/path/to/your/app
+          ssh -o StrictHostKeyChecking=no -i deploy_key ubuntu@ec2-3-88-45-113.compute-1.amazonaws.com 'cd ~/github-actions-demo && git pull && npm install && pm2 restart all'
