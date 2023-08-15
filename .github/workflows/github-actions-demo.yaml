@@ -38,6 +38,5 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > deploy_key
           chmod 600 deploy_key
-          rsync -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" -r --delete-after ./ ubuntu@ec2-54-163-35-94.compute-1.amazonaws.com:~/github-actions-demo
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@ec2-54-163-35-94.compute-1.amazonaws.com: 'cd ~/github-actions-demo && git pull && npm install && pm2 restart all'
-
+          rsync -e "ssh -o StrictHostKeyChecking=no -i $(pwd)/deploy_key" -r --delete-after ./ ubuntu@ec2-54-163-35-94.compute-1.amazonaws.com:~/github-actions-demo
+          ssh -o StrictHostKeyChecking=no -i $(pwd)/deploy_key ubuntu@ec2-54-163-35-94.compute-1.amazonaws.com 'cd ~/github-actions-demo && git pull && npm install && pm2 restart all'
