@@ -15,4 +15,11 @@ app.get("/test", (req, res) => {
       "Man you have nailed have confidence on yourself god will help you and you will succed in life."
     );
 });
+app.get("/temp", (req, res) => {
+  return res
+    .status(200)
+    .json(
+      "Ok done move on to ebuyers backend but still check if any other method rather than transferring files to remote server."
+    );
+});
 app.listen(9000, () => console.log("server started at 9000"));
