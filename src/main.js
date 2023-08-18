@@ -22,4 +22,7 @@ app.get("/temp", (req, res) => {
       "Ok done move on to ebuyers backend but still check if any other method rather than transferring files to remote server."
     );
 });
+app.get("/krish", (req, res) => {
+  return res.status(200).json("last route to check before finalizing");
+});
 app.listen(9000, () => console.log("server started at 9000"));
