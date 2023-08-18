@@ -48,14 +48,14 @@ jobs:
           rsync -e "ssh -o StrictHostKeyChecking=no -i $(pwd)/deploy_key" -r --delete-after ./ ubuntu@ec2-44-204-15-36.compute-1.amazonaws.com:~/github-actions-demo
           
           # SSH into the remote server and execute deployment commands
-          ssh -o StrictHostKeyChecking=no -i $(pwd)/deploy_key ubuntu@ec2-44-204-15-36.compute-1.amazonaws.com'
-            cd ~/github-actions-demo &&         # Navigate to the project directory
-            git pull &&                        # Pull the latest changes from the repository
-            npm install &&                     # Install npm dependencies
-            npm run build &&                   # Build the NestJS application
-            pm2 restart all                    # Restart the application with PM2
+          ssh -o StrictHostKeyChecking=no -i $(pwd)/deploy_key ubuntu@ec2-44-204-15-36.compute-1.amazonaws.com '
+            cd ~/github-actions-demo &&
+            git pull &&
+            npm install &&
+            npm run build &&
+            pm2 restart all
           ' > deploy_log.txt 2>&1
-
+          
       - name: Upload Deploy Logs
         uses: actions/upload-artifact@v2
         with:
