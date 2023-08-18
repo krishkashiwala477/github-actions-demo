@@ -24,10 +24,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Add a step to list the contents of the source directory before rsync
-      - name: List Source Directory Contents
-        run: ls -al
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -42,20 +38,8 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > deploy_key
           chmod 600 deploy_key
-          
-          # Use rsync to copy files to the remote server
-          # Use double quotes for better readability
-          rsync -e "ssh -v -o StrictHostKeyChecking=no -i $(pwd)/deploy_key" -r --delete-after ./ ubuntu@ec2-44-204-15-36.compute-1.amazonaws.com:~/github-actions-demo
-          
-          # SSH into the remote server and execute deployment commands
-          ssh -v -o StrictHostKeyChecking=no -i $(pwd)/deploy_key ubuntu@ec2-44-204-15-36.compute-1.amazonaws.com '
-            cd ~/github-actions-demo &&
-            git pull &&
-            npm install &&
-            npm run build &&
-            pm2 restart all
-          ' > deploy_log.txt 2>&1
-          
+          rsync -e "ssh -o StrictHostKeyChecking=no -i $(pwd)/deploy_key" -r --delete-after ./ ubuntu@ec2-44-204-15-36.compute-1.amazonaws.com:~/github-actions-demo
+          ssh -o StrictHostKeyChecking=no -i $(pwd)/deploy_key ubuntu@ec2-44-204-15-36.compute-1.amazonaws.com 'cd ~/github-actions-demo && git pull && npm install && pm2 restart all' > deploy_log.txt 2>&1
       - name: Upload Deploy Logs
         uses: actions/upload-artifact@v2
         with:
