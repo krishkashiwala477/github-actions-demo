@@ -26,4 +26,11 @@ app.get("/temp", (req, res) => {
 app.get("/krish", (req, res) => {
   return res.status(200).json("last route to check before finalizing");
 });
+app.get("/final", (req, res) => {
+  return res
+    .status(200)
+    .json(
+      "directly pushing from vscode and then your CI/CD is setup successfully if u see this route. signing off.!.."
+    );
+});
 app.listen(9000, () => console.log("server started at 9000"));
