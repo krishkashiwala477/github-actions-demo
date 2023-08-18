@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,25 +24,15 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Move build output to deploy directory
-        run: mv dist deploy
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Deploy to server
         env:
           PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
         run: |
           echo "$PRIVATE_KEY" > deploy_key
           chmod 600 deploy_key
-          rsync -e "ssh -o StrictHostKeyChecking=no -i $(pwd)/deploy_key" -r --delete-after ./deploy/ ubuntu@ec2-44-204-15-36.compute-1.amazonaws.com:~/github-actions-demo
+          rsync -e "ssh -o StrictHostKeyChecking=no -i $(pwd)/deploy_key" -r --delete-after ./dist/ ./ ubuntu@ec2-44-204-15-36.compute-1.amazonaws.com:~/github-actions-demo
           ssh -o StrictHostKeyChecking=no -i $(pwd)/deploy_key ubuntu@ec2-44-204-15-36.compute-1.amazonaws.com 'cd ~/github-actions-demo && git pull && npm install && pm2 restart all' > deploy_log.txt 2>&1
+          
       - name: Upload Deploy Logs
         uses: actions/upload-artifact@v2
         with:
